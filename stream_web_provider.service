@@ -1,0 +1,14 @@
+# place in /etc/systemd/system
+[Unit]
+Description=Service to publish the video stream of a camera
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=60
+User=<your-user>
+WorkingDirectory=/home/<your-user>/
+ExecStart=python -m stream-web-provider
+
+[Install]
+WantedBy=multi-user.target

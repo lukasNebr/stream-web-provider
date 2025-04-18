@@ -1,0 +1,9 @@
+[installer]
+max-workers = 4  # Too many workers will cause Artifactory issues.
+
+[repositories]
+global.url = "https://pypi.org/simple"
+
+[virtualenvs]
+create = true
+in-project = true

@@ -1,0 +1,58 @@
+[tool.poetry]
+name = "stream-web-provider"
+version = "0.1.0"
+description = "Flask based web video stream provider"
+authors = [
+    "LukasNebr",
+]
+
+packages = [
+    { include = "stream_web_provider" },
+]
+
+[tool.poetry.scripts]
+stream-web-provider = "stream_web_provider.main:main"
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "*"
+flake8-pyproject = "*"
+pip = "*"
+poetry = "*"
+pylint = "*"
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+flask = "*"
+opencv-python = "*"
+
+[build-system]
+requires = [
+    "poetry-core",
+]
+build-backend = "poetry.core.masonry.api"
+
+[tool.flake8]
+ignore = [
+    "D203",
+    "I100",
+    "I101",
+    "I201",
+]
+max-line-length = 120
+per-file-ignores = [
+    "__init__.py:F401",
+    "namelist.py:E501"
+]
+exclude = [
+    ".venv"
+]
+
+[tool.pylint]
+disable = "missing-module-docstring, missing-class-docstring, missing-function-docstring, too-many-public-methods, too-few-public-methods, logging-fstring-interpolation, import-outside-toplevel, too-many-locals, too-many-statements, too-many-branches, too-many-return-statements, invalid-name, too-many-instance-attributes, broad-exception-raised, inconsistent-return-statements, global-statement, duplicate-code, cyclic-import, fixme"
+recursive = true
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.pylint.MASTER]
+ignore-paths = '^.*(.venv/|namelist.py).*$'
