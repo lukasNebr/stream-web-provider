@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "stream-web-provider"
-version = "0.1.0"
+version = "0.1.1"
 description = "Flask based web video stream provider"
 authors = [
     "LukasNebr",
@@ -50,6 +50,7 @@ exclude = [
 [tool.pylint]
 disable = "missing-module-docstring, missing-class-docstring, missing-function-docstring, too-many-public-methods, too-few-public-methods, logging-fstring-interpolation, import-outside-toplevel, too-many-locals, too-many-statements, too-many-branches, too-many-return-statements, invalid-name, too-many-instance-attributes, broad-exception-raised, inconsistent-return-statements, global-statement, duplicate-code, cyclic-import, fixme"
 recursive = true
+generated-members = "cv2.*"
 
 [tool.pylint.format]
 max-line-length = 120
