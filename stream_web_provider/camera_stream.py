@@ -50,7 +50,7 @@ class CameraStream:
             Thread(target=self._start_camera).start()
 
     def _start_camera(self):
-        self._camera = cv2.VideoCapture(self._camera_index)
+        self._camera = cv2.VideoCapture(self._camera_index, cv2.CAP_DSHOW)
 
         self._camera.set(cv2.CAP_PROP_FRAME_WIDTH, self._with)
         self._camera.set(cv2.CAP_PROP_FRAME_HEIGHT, self._height)
