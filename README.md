@@ -9,9 +9,13 @@ When a user connects to the web application and requests the camera stream, a co
 As soon as the user stops the stream or the selected/default stream duration is expired, the stream is stopped and the USB camera released.
 After the stream other applications can access the camera.
 
-To run the tool, please install the Python package and run command: ``stream-web-provider``
+To run the tool, please install the Python package and run the following command: 
 
-For information about available configuration arguments please run ``stream-web-provider --help``.
+``stream-web-provider``
+
+For information about available configuration arguments please run:
+
+``stream-web-provider --help``.
 
 ## Firewall Rules
 
@@ -24,8 +28,8 @@ Open the firewall port:
 
 ## System Service
 
-For a permanent execution of the application, please install the provided system service (*stream_web_provider.service*).
-Please add this file inside the */etc/systemd/system* directory of your system.
+For permanent execution of the application (in the background), please install the provided system service (*stream_web_provider.service*).
+Please add this file inside the */etc/systemd/system/* directory of your system.
 Inside this file you have to update the dummy username with your username.
 
 After this steps you have to enable the servie:
