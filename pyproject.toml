@@ -30,6 +30,7 @@ flake8-pyproject = "*"
 pip = "*"
 poetry = "*"
 pylint = "*"
+twine = "*"
 
 [tool.poetry.dependencies]
 python = ">=3.10"
