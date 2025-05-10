@@ -1,5 +1,10 @@
 # stream-web-provider
 
+Links
+
+- [Github](https://github.com/lukasNebr/stream-web-provider)
+- [PyPi](https://pypi.org/project/stream-web-provider/)
+
 ## General 
 
 This is a little useful tool to provide access to the camera of a PC to remote users via a web application.
