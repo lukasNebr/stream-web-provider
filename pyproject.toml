@@ -5,10 +5,21 @@ description = "Flask based web video stream provider"
 authors = [
     "LukasNebr",
 ]
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "Apache-2.0"
 
 packages = [
     { include = "stream_web_provider" },
 ]
+
+[tool.poetry.urls]
+homepage = "https://github.com/lukasNebr/stream-web-provider"
+repository = "https://github.com/lukasNebr/stream-web-provider"
+issues = "https://github.com/lukasNebr/stream-web-provider/issues"
 
 [tool.poetry.scripts]
 stream-web-provider = "stream_web_provider.main:main"
