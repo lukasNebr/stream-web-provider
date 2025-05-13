@@ -28,12 +28,12 @@ stream-web-provider = "stream_web_provider.main:main"
 flake8 = "*"
 flake8-pyproject = "*"
 pip = "*"
-poetry = "*"
+poetry = "^2.1"
 pylint = "*"
 twine = "*"
 
 [tool.poetry.dependencies]
-python = ">=3.10"
+python = ">=3.10,<4.0"
 flask = "*"
 opencv-python = "*"
 
