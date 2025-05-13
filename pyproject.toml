@@ -1,14 +1,25 @@
 [tool.poetry]
 name = "stream-web-provider"
-version = "0.1.1"
+version = "0.1.2"
 description = "Flask based web video stream provider"
 authors = [
     "LukasNebr",
 ]
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "Apache-2.0"
 
 packages = [
     { include = "stream_web_provider" },
 ]
+
+[tool.poetry.urls]
+homepage = "https://github.com/lukasNebr/stream-web-provider"
+repository = "https://github.com/lukasNebr/stream-web-provider"
+issues = "https://github.com/lukasNebr/stream-web-provider/issues"
 
 [tool.poetry.scripts]
 stream-web-provider = "stream_web_provider.main:main"
@@ -17,11 +28,12 @@ stream-web-provider = "stream_web_provider.main:main"
 flake8 = "*"
 flake8-pyproject = "*"
 pip = "*"
-poetry = "*"
+poetry = "^2.1"
 pylint = "*"
+twine = "*"
 
 [tool.poetry.dependencies]
-python = ">=3.10"
+python = ">=3.10,<4.0"
 flask = "*"
 opencv-python = "*"
 
