@@ -1,8 +1,12 @@
 import datetime
+import logging
 import os
+import time
 from threading import Thread
 
 import cv2
+
+from stream_web_provider.interruptable_thread import InterruptableThread
 
 
 class CameraStream:
@@ -43,17 +47,59 @@ class CameraStream:
         return buffer.tobytes()
 
     def start(self, stream_duration: float):
+        logging.info(f"Start camera stream with duration: {stream_duration}")
+
         self._stream_end = datetime.datetime.now() + datetime.timedelta(seconds=stream_duration)
         self._is_stopped = False
 
         if self._camera is None:
             Thread(target=self._start_camera).start()
 
-    def _start_camera(self):
-        self._camera = cv2.VideoCapture(self._camera_index, cv2.CAP_DSHOW)
+    def _open_camera(self, *args):
+        try:
+            self._camera = cv2.VideoCapture(self._camera_index, *args)
+        except KeyboardInterrupt:
+            pass
 
-        self._camera.set(cv2.CAP_PROP_FRAME_WIDTH, self._with)
-        self._camera.set(cv2.CAP_PROP_FRAME_HEIGHT, self._height)
+    def _start_camera(self):
+        try:
+            logging.info("Try to open camera")
+
+            start_time = time.time()
+            end_time = start_time + 2
+
+            open_camera_thread = InterruptableThread(target=self._open_camera)
+            open_camera_thread.start()
+
+            while time.time() < end_time and open_camera_thread.is_alive():
+                time.sleep(0.05)
+
+            if open_camera_thread.is_alive():
+                logging.error("Failed to open camera with default setting, trying with DSHOW")
+
+                open_camera_thread.interrupt()
+                open_camera_thread = InterruptableThread(target=self._open_camera, args=(cv2.CAP_DSHOW,))
+                open_camera_thread.start()
+
+            open_camera_thread.join()
+
+            self._camera.set(cv2.CAP_PROP_FRAME_WIDTH, float(self._with))
+            self._camera.set(cv2.CAP_PROP_FRAME_HEIGHT, float(self._height))
+
+            # read first frame from camera, otherwise the capturing mechanism cannot access the camera stream
+            success, frame = self._camera.read()
+
+            if not success:
+                logging.error(f"Cannot open camera stream - success: {success} - frame: {frame}")
+                return
+
+            self._is_stopped = False
+
+            logging.info("Camera is opened")
+        # pylint: disable=broad-exception-caught
+        except Exception as e:
+            logging.error(f"Failed to open camera: {e}")
+            self._is_stopped = True
 
     def stop(self):
         if self._camera is None:
@@ -73,18 +119,23 @@ class CameraStream:
                 continue
 
             if self._camera is None or not self._camera.isOpened():
-                # wait until camera is ready
+                # wait until the camera is ready
                 yield b"--frame\r\nContent-Type: image/jpeg\r\n\r\n" + self._connecting_frame_bytes + b"\r\n"  # noqa
 
                 continue
 
+            logging.info("Camera is active")
+
             if datetime.datetime.now() > self._stream_end:
+                logging.info(f"Stream duration is expired: {self._stream_end}")
+
                 self.stop()
                 continue
 
             success, frame = self._camera.read()
 
             if not success:
+                logging.error(f"Cannot read frame from camera - success: {success} - frame: {frame}")
                 self.stop()
                 continue
 
