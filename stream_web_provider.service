@@ -8,7 +8,7 @@ Restart=always
 RestartSec=60
 User=<your-user>
 WorkingDirectory=~
-ExecStart=stream-web-provider
+ExecStart=/bin/bash -c 'PATH=~/.local/bin:$PATH exec stream-web-provider'
 
 [Install]
 WantedBy=multi-user.target
