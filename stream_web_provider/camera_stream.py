@@ -2,7 +2,7 @@ import datetime
 import logging
 import os
 import time
-from threading import Thread
+from threading import Thread, Lock
 
 import cv2
 
@@ -18,6 +18,7 @@ class CameraStream:
         self._height: int = resolution[1] if resolution is not None else 720
 
         self._camera: cv2.VideoCapture | None = None
+        self._camera_lock: Lock = Lock()
 
         self._stream_end: datetime.datetime = datetime.datetime.now()
         self._is_stopped: bool = True
@@ -68,37 +69,38 @@ class CameraStream:
             start_time = time.time()
             end_time = start_time + 2
 
-            open_camera_thread = InterruptableThread(target=self._open_camera)
-            open_camera_thread.start()
-
-            while time.time() < end_time and open_camera_thread.is_alive():
-                time.sleep(0.05)
-
-            if open_camera_thread.is_alive():
-                logging.error("Failed to open camera with default setting, trying with DSHOW")
-
-                open_camera_thread.interrupt()
-                open_camera_thread = InterruptableThread(target=self._open_camera, args=(cv2.CAP_DSHOW,))
+            with self._camera_lock:
+                open_camera_thread = InterruptableThread(target=self._open_camera)
                 open_camera_thread.start()
 
-            open_camera_thread.join()
+                while time.time() < end_time and open_camera_thread.is_alive():
+                    time.sleep(0.05)
 
-            self._camera.set(cv2.CAP_PROP_FRAME_WIDTH, float(self._with))
-            self._camera.set(cv2.CAP_PROP_FRAME_HEIGHT, float(self._height))
+                if open_camera_thread.is_alive():
+                    logging.error("Failed to open camera with default setting, trying with DSHOW")
 
-            # read first frame from camera, otherwise the capturing mechanism cannot access the camera stream
-            success, frame = self._camera.read()
+                    open_camera_thread.interrupt()
+                    open_camera_thread = InterruptableThread(target=self._open_camera, args=(cv2.CAP_DSHOW,))
+                    open_camera_thread.start()
 
-            if not success:
-                logging.error(f"Cannot open camera stream - success: {success} - frame: {frame}")
-                return
+                open_camera_thread.join()
 
-            self._is_stopped = False
+                self._camera.set(cv2.CAP_PROP_FRAME_WIDTH, float(self._with))
+                self._camera.set(cv2.CAP_PROP_FRAME_HEIGHT, float(self._height))
+
+                # read first frame from camera, otherwise the capturing mechanism cannot access the camera stream
+                success, frame = self._camera.read()
+
+                if not success:
+                    logging.error(f"Cannot open camera stream - success: {success} - frame: {frame}")
+                    raise RuntimeError
 
             logging.info("Camera is opened")
+
         # pylint: disable=broad-exception-caught
         except Exception as e:
             logging.error(f"Failed to open camera: {e}")
+
             self._is_stopped = True
 
     def stop(self):
@@ -132,7 +134,16 @@ class CameraStream:
                 self.stop()
                 continue
 
-            success, frame = self._camera.read()
+            try:
+                with self._camera_lock:
+                    success, frame = self._camera.read()
+
+            # pylint: disable=broad-exception-caught
+            except Exception as e:
+                logging.error(f"Cannot read frame from camera: {e}")
+
+                success = False
+                frame = None
 
             if not success:
                 logging.error(f"Cannot read frame from camera - success: {success} - frame: {frame}")
