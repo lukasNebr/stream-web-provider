@@ -37,19 +37,29 @@ arg_parser.add_argument(
 
 arguments, _ = arg_parser.parse_known_args()
 
-port = arguments.port
-camera_index = arguments.camera_index
-resolution = tuple(int(x.strip()) for x in arguments.resolution.split(","))
-stream_duration_default = arguments.stream_duration
+port: int = arguments.port
 
-camera = CameraStream(camera_index, )
+camera_index: int = arguments.camera_index
+resolution: tuple[int, int] = (
+    int(arguments.resolution.split(",")[0].strip()),
+    int(arguments.resolution.split(",")[1].strip())
+)
+stream_duration_default: float = arguments.stream_duration
+
+camera: CameraStream = CameraStream(camera_index, resolution)
 
 app = Flask(__name__)
 
 
 @app.route("/")
 def index():
-    return render_template("index.html", stream_duration=stream_duration_default, system_name=platform.node())
+    stream_duration = request.args.get("stream_duration")
+
+    return render_template(
+        "index.html",
+        stream_duration=stream_duration if stream_duration else stream_duration_default,
+        system_name=platform.node()
+    )
 
 
 @app.route("/cameraStream")
@@ -69,7 +79,9 @@ def start_stream():
 
         camera.start(duration)
 
-    return redirect(url_for("index"))
+    return redirect(url_for(
+        "index", stream_duration=stream_duration if stream_duration else stream_duration_default
+    ))
 
 
 @app.route("/stopStream")
