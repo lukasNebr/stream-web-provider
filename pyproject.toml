@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "stream-web-provider"
-version = "0.1.4"
+version = "0.1.5"
 description = "Flask based web video stream provider"
 authors = [
     "LukasNebr",
