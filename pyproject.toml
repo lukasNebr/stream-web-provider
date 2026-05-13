@@ -28,7 +28,7 @@ stream-web-provider = "stream_web_provider.main:main"
 flake8 = "*"
 flake8-pyproject = "*"
 pip = "*"
-poetry = "^2.1"
+poetry = "^2.4"
 pylint = "*"
 twine = "*"
 
